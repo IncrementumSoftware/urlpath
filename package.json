@@ -1,0 +1,27 @@
+{
+  "name": "urlpath",
+  "version": "0.0.1",
+  "description": "creates redirect paths",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IncrementumSoftware/urlpath.git"
+  },
+  "author": "Incryment",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IncrementumSoftware/urlpath/issues"
+  },
+  "homepage": "https://github.com/IncrementumSoftware/urlpath#readme",
+  "dependencies": {
+    "@types/express": "^4.17.13",
+    "@types/moment": "^2.13.0",
+    "chalk": "^4.1.2",
+    "express": "^4.17.2",
+    "moment": "^2.29.1",
+    "ts-node": "^10.4.0"
+  }
+}
