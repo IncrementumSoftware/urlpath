@@ -5,10 +5,10 @@ import { redirection } from './route';
 if (require('fs').existsSync('../routes.json')) {
     require('fs').writeFileSync('../routes.json', JSON.stringify("{}"))
     log('routes', 'info', 'routes.json not found; created new routes file')
-    verifyIntegrityOfRoutesFile();
 }
+    verifyIntegrityOfRoutesFile();
 const srv: Application = e().use(require('express').urlencoded({ extended: true }))
-let _srv;
+let _srv = undefined;
 if (config.https_enabled) {
     log("https", 'info', "HTTPS enabled, registering HTTPS server")
     try {
@@ -21,6 +21,7 @@ if (config.https_enabled) {
         log('https', 'fatal', "Error while registering HTTPS server: Error during crt-key implementation")
         console.error(String(e).split('\n')[0])
         require('process').exit(0)
+
     }
 } else {
     log("https", 'warn', "HTTPS disabled (unrecommended), registering HTTP server")
@@ -31,7 +32,7 @@ if (config.https_enabled) {
 srv.use((new redirection).middleware)
 
 try {
-    srv.listen(config.port, () => {
+    _srv.listen(config.port, () => {
         log('server', 'info', `Listening on port ${config.port}`)
         log('server', 'info', "HTTPS? " + Boolean(config.https_enabled))
     })
@@ -42,11 +43,29 @@ try {
 }
 
 function verifyIntegrityOfRoutesFile() {
-    const conf = require('../routes.json')
-    for (var route in conf) {
-        // match
+    const conf: object = require('../routes.json')
+    const verifyRegEx = /(http|https)?:\/\/(\S+)/
+    const objkey = Object.keys(conf)
+    for (let i = 0; i != objkey.length; i++) {
+        if (verifyRegEx.test(toArray(conf)[i])) {
+          log("RouteIntegrityChecker", "info", "Route " + objkey[i] + " passed integrity check.")
+          continue;
+        } else {
+          log("RouteIntegrityChecker", "warn", "Route " + objkey[i] + " did not pass integrity check, issues may occur")
+        }
     }
 }
 export function getServer(): Application {
     return srv;
+}
+
+function toArray(json: any): any[] {
+  let objkeys = Object.keys(json);
+  let i = 0;
+  const array: any[] = []
+  for (let prop in json) {
+    array.push([objkeys[i], json[prop]])
+    i++;
+  }
+  return array;
 }
